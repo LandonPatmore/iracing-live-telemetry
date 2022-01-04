@@ -1,6 +1,6 @@
 from typing import List
 
-from influxdb_client import InfluxDBClient, Point, WritePrecision
+from influxdb_client import InfluxDBClient, Point
 from influxdb_client.client.write_api import ASYNCHRONOUS
 
 from classes.CarInfo import CarInfo
@@ -19,7 +19,7 @@ def push_to_db(telemetry_info: TelemetryInfo):
 
     print(telemetry_info)
 
-    with InfluxDBClient(url="http://localhost:8086", token=token, org=org) as client:
+    with InfluxDBClient(url="http://192.168.86.64:8086", token=token, org=org) as client:
         write_api = client.write_api(write_options=ASYNCHRONOUS)
 
         points = [__create_car_info_point(telemetry_info.carInfo),

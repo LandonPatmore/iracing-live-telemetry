@@ -15,7 +15,7 @@ def check_iracing():
         # we are shutting down ir library (clearing all internal variables)
         ir.shutdown()
         print('irsdk disconnected')
-    elif not state.ir_connected and ir.startup(test_file='data/data.bin') and ir.is_initialized and ir.is_connected:
+    elif not state.ir_connected and ir.startup() and ir.is_initialized and ir.is_connected:
         state.ir_connected = True
         print('irsdk connected')
 

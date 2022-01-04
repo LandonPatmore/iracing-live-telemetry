@@ -30,8 +30,6 @@ def telemetry_gathering():
         sessionInfo=SessionInfo(**request_json['sessionInfo']),
         weatherInfo=WeatherInfo(**request_json['weatherInfo'])
     ))
-    # j = jsons.loads(request.json)
-    # print(general_info_scrub(j['generalInfo']))
     return jsonify(success=True)
 
 
