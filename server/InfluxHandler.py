@@ -20,7 +20,7 @@ def push_to_db(telemetry_info: TelemetryInfo):
 
     print(telemetry_info)
 
-    with InfluxDBClient(url="http://localhost:8086", token=token, org=org) as client:
+    with InfluxDBClient(url="http://192.168.86.64:8086", token=token, org=org) as client:
         write_api = client.write_api(write_options=ASYNCHRONOUS)
 
         points = [__create_car_info_point(telemetry_info.carInfo),
