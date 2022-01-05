@@ -5,6 +5,7 @@ Info pertaining to a competitor in the session.
 """
 
 
+# Non time series data but does update periodically because of driver changes
 @dataclass
 class CompetitorInfo:
     carIdx: int

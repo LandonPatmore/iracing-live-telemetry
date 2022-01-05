@@ -5,6 +5,7 @@ Info about the car of the user.
 """
 
 
+# Time series data (tick)
 @dataclass
 class CarInfo:
     brakeInput: float

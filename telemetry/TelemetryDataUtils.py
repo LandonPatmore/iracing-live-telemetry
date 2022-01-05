@@ -4,6 +4,7 @@ import irsdk
 from classes.CarInfo import CarInfo
 from classes.CompetitorInfo import CompetitorInfo
 from classes.GeneralInfo import GeneralInfo
+from classes.RaceInfo import RaceInfo
 from classes.SessionInfo import SessionInfo
 from classes.WeatherInfo import WeatherInfo
 
@@ -30,17 +31,12 @@ def get_general_info(ir: irsdk) -> GeneralInfo:
         numTurns=weekend_info['TrackNumTurns'],
         pitSpeedLimit=weekend_info['TrackPitSpeedLimit'],
         displayUnits=ir['DisplayUnits'],
-        sectors=list(map(lambda sector: sector['SectorStartPct'], ir['SplitTimeInfo']['Sectors'])),
-        sessionState=ir['SessionState'],
-        sessionTime=ir['SessionTime'],
-        sessionTimeOfDay=ir['SessionTimeOfDay'],
-        sessionTimeRemaining=ir['SessionTimeRemain'],
-        sessionTimeTotal=ir['SessionTimeTotal']
+        sectors=list(map(lambda sector: sector['SectorStartPct'], ir['SplitTimeInfo']['Sectors']))
     )
 
 
-def get_session_info(ir: irsdk) -> SessionInfo:
-    return SessionInfo(
+def get_race_info(ir: irsdk) -> RaceInfo:
+    return RaceInfo(
         bestLapNum=ir['CarIdxBestLapNum'],
         bestLapTime=ir['CarIdxBestLapTime'],
         carClass=ir['CarIdxClass'],
@@ -52,6 +48,16 @@ def get_session_info(ir: irsdk) -> SessionInfo:
         onPitRoad=ir['CarIdxOnPitRoad'],
         position=ir['CarIdxPosition'],
         onTrackStatus=ir['CarIdxTrackSurface']
+    )
+
+
+def get_session_info(ir: irsdk) -> SessionInfo:
+    return SessionInfo(
+        sessionState=ir['SessionState'],
+        sessionTimeSinceStart=ir['SessionTime'],
+        sessionTimeOfDay=ir['SessionTimeOfDay'],
+        sessionTimeRemaining=ir['SessionTimeRemain'],
+        sessionTimeTotal=ir['SessionTimeTotal']
     )
 
 

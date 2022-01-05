@@ -6,6 +6,7 @@ from influxdb_client.client.write_api import ASYNCHRONOUS
 from classes.CarInfo import CarInfo
 from classes.CompetitorInfo import CompetitorInfo
 from classes.GeneralInfo import GeneralInfo
+from classes.RaceInfo import RaceInfo
 from classes.SessionInfo import SessionInfo
 from classes.TelemetryInfo import TelemetryInfo
 from classes.WeatherInfo import WeatherInfo
@@ -19,14 +20,15 @@ def push_to_db(telemetry_info: TelemetryInfo):
 
     print(telemetry_info)
 
-    with InfluxDBClient(url="http://192.168.86.64:8086", token=token, org=org) as client:
+    with InfluxDBClient(url="http://localhost:8086", token=token, org=org) as client:
         write_api = client.write_api(write_options=ASYNCHRONOUS)
 
         points = [__create_car_info_point(telemetry_info.carInfo),
                   __create_general_info_point(telemetry_info.generalInfo),
-                  __create_weather_info_point(telemetry_info.weatherInfo)] + __create_session_info_points(
+                  __create_weather_info_point(telemetry_info.weatherInfo),
+                  __create_session_info_points(telemetry_info.sessionInfo)] + __create_race_info_points(
             telemetry_info.competitorInfo,
-            telemetry_info.sessionInfo)
+            telemetry_info.raceInfo)
 
         write_api.write(bucket, org, points)
 
@@ -52,12 +54,7 @@ def __create_general_info_point(general_info: GeneralInfo) -> Point:
         .field("trackId", general_info.trackId) \
         .field("trackConfigName", general_info.trackConfigName) \
         .field("displayUnits", general_info.displayUnits) \
-        .field("pitSpeedLimit", general_info.pitSpeedLimit) \
-        .field("sessionState", general_info.sessionState) \
-        .field("sessionTime", general_info.sessionTime) \
-        .field("sessionTimeTotal", general_info.sessionTimeTotal) \
-        .field("sessionTimeRemaining", general_info.sessionTimeRemaining) \
-        .field("sessionTimeOfDay", general_info.sessionTimeOfDay)
+        .field("pitSpeedLimit", general_info.pitSpeedLimit)
 
 
 def __create_weather_info_point(weather_info: WeatherInfo) -> Point:
@@ -69,28 +66,38 @@ def __create_weather_info_point(weather_info: WeatherInfo) -> Point:
         .field("windDirection", weather_info.windDirection)
 
 
-def __create_session_info_points(competitor_info: List[CompetitorInfo], session_info: SessionInfo) -> List[Point]:
+def __create_session_info_points(session_info: SessionInfo) -> Point:
+    return Point("session_info") \
+        .tag("session", "session") \
+        .field("sessionState", session_info.sessionState) \
+        .field("sessionTimeSinceStart", session_info.sessionTimeSinceStart) \
+        .field("sessionTimeTotal", session_info.sessionTimeTotal) \
+        .field("sessionTimeRemaining", session_info.sessionTimeRemaining) \
+        .field("sessionTimeOfDay", session_info.sessionTimeOfDay)
+
+
+def __create_race_info_points(competitor_info: List[CompetitorInfo], race_info: RaceInfo) -> List[Point]:
     competitors = list()
 
     for index, competitor in enumerate(competitor_info):
         competitors.append(
-            Point("session_info")
+            Point("race_info")
                 .tag("teamName", competitor.teamName + " | [#" + competitor.carNumber + "]")
                 .field("userName", competitor.userName)
                 .field("carName", competitor.carName)
                 .field("iRating", competitor.iRating)
                 .field("license", competitor.license)
-                .field("position", session_info.position[index])
-                .field("carClassPosition", session_info.carClassPosition[index])
-                .field("raceTime", session_info.raceTime[index])
-                .field("carClass", session_info.carClass[index])
-                .field("onPitRoad", session_info.onPitRoad[index])
-                .field("bestLapNum", session_info.bestLapNum[index])
-                .field("bestLapTime", session_info.bestLapTime[index])
-                .field("lapsCompleted", session_info.lapsCompleted[index])
-                .field("lastLapTime", session_info.lastLapTime[index])
-                .field("onTrackStatus", session_info.onTrackStatus[index])
-                .field("percentageAroundTrack", session_info.percentageAroundTrack[index])
+                .field("position", race_info.position[index])
+                .field("carClassPosition", race_info.carClassPosition[index])
+                .field("raceTime", race_info.raceTime[index])
+                .field("carClass", race_info.carClass[index])
+                .field("onPitRoad", race_info.onPitRoad[index])
+                .field("bestLapNum", race_info.bestLapNum[index])
+                .field("bestLapTime", race_info.bestLapTime[index])
+                .field("lapsCompleted", race_info.lapsCompleted[index])
+                .field("lastLapTime", race_info.lastLapTime[index])
+                .field("onTrackStatus", race_info.onTrackStatus[index])
+                .field("percentageAroundTrack", race_info.percentageAroundTrack[index])
         )
 
     return competitors

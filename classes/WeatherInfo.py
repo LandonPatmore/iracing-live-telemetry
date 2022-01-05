@@ -5,6 +5,7 @@ Info about the weather in the session.
 """
 
 
+# Time series data (tick)
 @dataclass
 class WeatherInfo:
     airTemp: float

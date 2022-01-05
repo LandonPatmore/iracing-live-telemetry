@@ -8,6 +8,7 @@ Info about the session overall. This info does not change after the first update
 
 @dataclass
 class GeneralInfo:
+    # Static data
     name: str
     trackId: int
     trackConfigName: str
@@ -15,8 +16,3 @@ class GeneralInfo:
     pitSpeedLimit: str
     displayUnits: int
     sectors: List[float]
-    sessionState: int
-    sessionTime: float
-    sessionTimeOfDay: float
-    sessionTimeRemaining: float
-    sessionTimeTotal: float
