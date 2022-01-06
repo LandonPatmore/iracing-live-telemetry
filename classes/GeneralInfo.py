@@ -14,5 +14,4 @@ class GeneralInfo:
     trackConfigName: str
     numTurns: int
     pitSpeedLimit: str
-    displayUnits: int
     sectors: List[float]

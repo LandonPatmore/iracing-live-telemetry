@@ -1,63 +1,60 @@
-import asyncio
+import json
 import time
+
 import irsdk
-from TelemetryDataUtils import get_weather, get_car_info, get_competitors, get_general_info, get_race_info, \
+import jsons
+
+from TelemetryDataUtils import get_weather, get_competitors, get_general_info, get_race_info, \
     get_session_info
+from classes.Message import Message
+from classes.MessageTypes import TELEMETRY
 from classes.State import State
 from classes.TelemetryInfo import TelemetryInfo
-from telemetry.NetworkingHandler import send_data
+import threading
+
+from telemetry.WebSocketHandler import WebSocketHandler
 
 
-def check_iracing():
-    if state.ir_connected and not (ir.is_initialized and ir.is_connected):
-        state.ir_connected = False
-        # don't forget to reset your State variables
-        state.last_car_setup_tick = -1
-        # we are shutting down ir library (clearing all internal variables)
-        ir.shutdown()
-        print('irsdk disconnected')
-    elif not state.ir_connected and ir.startup(test_file='data/data.bin') and ir.is_initialized and ir.is_connected:
-        state.ir_connected = True
-        print('irsdk connected')
+class TelemetryLogger(threading.Thread):
+    def __init__(self, websocket_handler: WebSocketHandler):
+        threading.Thread.__init__(self, daemon=True)
+        self.state = State()
+        self.ir = irsdk.IRSDK()
+        self.should_run = True
+        self.websocket_handler = websocket_handler
 
+    def run(self):
+        while self.should_run:
+            self.is_sim_running()
+            if self.state.ir_connected:
+                data = self.get_iracing_data()
+                self.websocket_handler.send_data(jsons.dumps(Message(type=TELEMETRY, data=data)))
+                # time.sleep(0.1)  # Real
+                time.sleep(1)
 
-# our main loop, where we retrieve data
-# and do something useful with it
-def loop():
-    # data per tick since data can change midway
-    ir.freeze_var_buffer_latest()
+    def is_sim_running(self):
+        if self.state.ir_connected and not (self.ir.is_initialized and self.ir.is_connected):
+            self.state.ir_connected = False
+            # don"t forget to reset your State variables
+            self.state.last_car_setup_tick = -1
+            # we are shutting down ir library (clearing all internal variables)
+            self.ir.shutdown()
+            print("irsdk disconnected")
+        elif not self.state.ir_connected and self.ir.startup(
+                test_file="../data/data.bin") and self.ir.is_initialized and self.ir.is_connected:
+            self.state.ir_connected = True
+            print("irsdk connected")
 
-    t = TelemetryInfo(
-        sessionId=ir['WeekendInfo']['SessionID'],
-        tick=ir['SessionTick'],
-        carInfo=get_car_info(ir),
-        competitorInfo=get_competitors(ir),
-        generalInfo=get_general_info(ir),
-        raceInfo=get_race_info(ir),
-        sessionInfo=get_session_info(ir),
-        weatherInfo=get_weather(ir)
-    )
+    # our main loop, where we retrieve data
+    # and do something useful with it
+    def get_iracing_data(self) -> TelemetryInfo:
+        # data per tick since data can change midway
+        self.ir.freeze_var_buffer_latest()
 
-    asyncio.run(send_data(t))
-
-
-if __name__ == '__main__':
-    # initializing ir and state
-    ir = irsdk.IRSDK()
-    state = State()
-
-    try:
-        # infinite loop
-        while True:
-            # check if we are connected to iracing
-            check_iracing()
-            # if we are, then process data
-            if state.ir_connected:
-                loop()
-            # maximum you can use is 1/60
-            # cause iracing updates data with 60 fps
-            # time.sleep(0.1)  # Real
-            time.sleep(1)
-    except KeyboardInterrupt:
-        # press ctrl+c to exit
-        pass
+        return TelemetryInfo(
+            competitorInfo=get_competitors(self.ir),
+            # generalInfo=get_general_info(self.ir),
+            raceInfo=get_race_info(self.ir),
+            sessionInfo=get_session_info(self.ir),
+            weatherInfo=get_weather(self.ir)
+        )
