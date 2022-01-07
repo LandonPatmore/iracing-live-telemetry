@@ -15,7 +15,9 @@ class PushableCompetitorInfo:
     teamName: str
     carNumber: str
     carName: str
+    carClass: int
     carId: int
     iRating: int
     license: str
     licenseColor: int
+    carIsPaceCar: int

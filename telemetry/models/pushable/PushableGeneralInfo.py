@@ -13,5 +13,5 @@ class PushableGeneralInfo:
     trackId: int
     trackConfigName: str
     numTurns: int
-    pitSpeedLimit: str
+    pitSpeedLimit: int
     sectors: List[float]
