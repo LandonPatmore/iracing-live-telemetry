@@ -13,7 +13,7 @@ fun main() {
             ws.onConnect { context ->
                 usersConnected.add(ConnectedUser(context, context.pathParam("user-id")))
                 if (shouldStartSendingData()) {
-                    context.send(SendableMessage(1))
+                    context.send(SendableMessage(true))
                 }
             }
 
@@ -37,7 +37,7 @@ fun main() {
 
 private fun shouldStartSendingData(): Boolean = usersConnected.size == 1
 
-private data class SendableMessage(val type: Int)
+private data class SendableMessage(val send: Boolean)
 
 private data class ReceivedMessage(
     val type: Int,

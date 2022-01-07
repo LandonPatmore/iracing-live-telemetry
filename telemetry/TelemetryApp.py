@@ -1,24 +1,21 @@
+import _thread
 from queue import Queue
 
 from telemetry.TelemetryLogger import TelemetryLogger
-from telemetry.WebSocketHandler import WebSocketHandler
-from telemetry.models.MessageTypes import GENERAL_INFO, TELEMETRY
+from telemetry.networking.rest.NetworkSender import NetworkSender
+from telemetry.networking.websockets.WebSocketHandler import WebSocketHandler
 
-# work_queue = Queue()
-# websocket_handler = WebSocketHandler(websocket_url="ws://localhost:7000/telemetry/1234", work_queue=work_queue)
-telemetry_logger = TelemetryLogger()
+pushable_queue = Queue()
+receiver_queue = Queue()
+streaming_queue = Queue()
+websocket_handler = WebSocketHandler(websocket_url="ws://localhost:7000/telemetry/1234", receiver_queue=receiver_queue,
+                                     streaming_queue=streaming_queue)
+network_sender = NetworkSender(pushing_queue=pushable_queue)
+telemetry_logger = TelemetryLogger(receiver_queue=receiver_queue, pushable_queue=pushable_queue,
+                                   streaming_queue=streaming_queue)
 
 if __name__ == "__main__":
+    websocket_handler.start()
     telemetry_logger.start()
-
     while True:
         pass
-    # websocket_handler.start()
-    # while True:
-    #     item = work_queue.get(block=True)
-    #     if item == GENERAL_INFO:
-    #         print("general info requested")
-    #     elif item == TELEMETRY:
-    #         print("start sending iracing data")
-    #         telemetry_logger.start()
-    #     work_queue.task_done()

@@ -1,4 +1,6 @@
 import time
+from queue import Queue
+
 import irsdk
 import jsons
 
@@ -13,30 +15,33 @@ from TelemetryDataUtils import (
 )
 import threading
 
-from telemetry.WebSocketHandler import WebSocketHandler
-from telemetry.models.Message import Message
-from telemetry.models.MessageTypes import TELEMETRY
 from telemetry.models.State import State
 from telemetry.models.pushable.PushableAggregator import PushableAggregator
 from telemetry.models.streamable.StreamableAggregator import StreamableAggregator
 
 
 class TelemetryLogger(threading.Thread):
-    def __init__(self):
+    def __init__(self, receiver_queue: Queue, pushable_queue: Queue, streaming_queue: Queue):
         threading.Thread.__init__(self, daemon=True)
         self.state = State()
         self.ir = irsdk.IRSDK()
         self.should_run = True
-        # self.websocket_handler = websocket_handler
+        self.receiver_queue = receiver_queue
+        self.pushable_queue = pushable_queue
+        self.streaming_queue = pushable_queue
 
     def run(self):
         while self.should_run:
             self.is_sim_running()
             if self.state.ir_connected:
                 self.get_iracing_data()
-                # self.websocket_handler.send_data(jsons.dumps(Message(type=TELEMETRY, data=data)))
                 # time.sleep(0.1)  # Real
-                time.sleep(1)
+                time.sleep(5)
+            if self.receiver_queue.empty():
+                continue
+            else:
+                self.should_run = self.receiver_queue.get()
+                self.receiver_queue.task_done()
 
     def is_sim_running(self):
         if self.state.ir_connected and not (self.ir.is_initialized and self.ir.is_connected):
@@ -60,8 +65,7 @@ class TelemetryLogger(threading.Thread):
             generalInfo=get_pushable_general_info(self.ir),
             raceInfo=get_pushable_race_info(self.ir)
         )
-
-        # print(jsons.dumps(pushable))
+        self.pushable_queue.put(pushable)
 
         streamable = StreamableAggregator(
             playerCarInfo=get_streamable_player_car_info(self.ir),
@@ -70,6 +74,4 @@ class TelemetryLogger(threading.Thread):
             weatherInfo=get_streamable_weather_info(self.ir)
         )
 
-        # print("====================================================")
-        #
-        print(jsons.dumps(streamable))
+        self.streaming_queue.put(streamable)
