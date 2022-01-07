@@ -1,11 +1,6 @@
 from dataclasses import dataclass
 
-"""
-Info about the car of the user.
-"""
 
-
-# Streaming data (websocket)
 @dataclass
 class StreamablePlayerCarInfo:
     brakeInput: float

@@ -1,7 +1,6 @@
 import math
 from typing import List
 import irsdk
-
 from telemetry.models.pushable.PushableCompetitorInfo import PushableCompetitorInfo
 from telemetry.models.pushable.PushableGeneralInfo import PushableGeneralInfo
 from telemetry.models.pushable.PushableRaceInfo import PushableRaceInfo

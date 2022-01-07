@@ -1,5 +1,4 @@
 import threading
-
 import jsons
 import websocket
 from queue import Queue

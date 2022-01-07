@@ -3,12 +3,12 @@ from queue import Queue
 
 
 class NetworkSender(threading.Thread):
-    def __init__(self, pushing_queue: Queue):
+    def __init__(self, pushable_queue: Queue):
         threading.Thread.__init__(self, daemon=True)
-        self.pushing_queue = pushing_queue
+        self.pushable_queue = pushable_queue
 
     def run(self):
         while True:
-            item = self.pushing_queue.get(block=True)
+            item = self.pushable_queue.get(block=True)
             print("Pushing %s" % item)
-            self.pushing_queue.task_done()
+            self.pushable_queue.task_done()

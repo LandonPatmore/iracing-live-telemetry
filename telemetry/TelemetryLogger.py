@@ -1,8 +1,6 @@
 import time
 from queue import Queue
-
 import irsdk
-import jsons
 
 from TelemetryDataUtils import (
     get_pushable_race_info,
@@ -28,9 +26,15 @@ class TelemetryLogger(threading.Thread):
         self.should_run = True
         self.receiver_queue = receiver_queue
         self.pushable_queue = pushable_queue
-        self.streaming_queue = pushable_queue
+        self.streaming_queue = streaming_queue
 
     def run(self):
+        # TODO: Fix this
+        while True:
+            self.should_run = self.receiver_queue.get(block=True)
+            if self.should_run:
+                break
+
         while self.should_run:
             self.is_sim_running()
             if self.state.ir_connected:

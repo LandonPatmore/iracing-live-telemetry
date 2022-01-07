@@ -1,9 +1,5 @@
 from dataclasses import dataclass
 
-"""
-State information about the telemetry logger.
-"""
-
 
 @dataclass
 class State:
