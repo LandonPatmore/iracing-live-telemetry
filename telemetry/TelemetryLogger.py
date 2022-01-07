@@ -64,6 +64,14 @@ class TelemetryLogger(threading.Thread):
         # data per tick since data can change midway
         self.ir.freeze_var_buffer_latest()
 
+        streamable = StreamableAggregator(
+            playerCarInfo=get_streamable_player_car_info(self.ir),
+            raceInfo=get_streamable_race_info(self.ir),
+            sessionInfo=get_streamable_session_info(self.ir),
+            weatherInfo=get_streamable_weather_info(self.ir)
+        )
+        self.streaming_queue.put(streamable)
+
         pushable = PushableAggregator(
             competitorInfo=get_pushable_competitor_info(self.ir),
             generalInfo=get_pushable_general_info(self.ir),
@@ -71,11 +79,4 @@ class TelemetryLogger(threading.Thread):
         )
         self.pushable_queue.put(pushable)
 
-        streamable = StreamableAggregator(
-            playerCarInfo=get_streamable_player_car_info(self.ir),
-            raceInfo=get_streamable_race_info(self.ir),
-            sessionInfo=get_streamable_session_info(self.ir),
-            weatherInfo=get_streamable_weather_info(self.ir)
-        )
-
-        self.streaming_queue.put(streamable)
+    # def determine_if_push_data(self):

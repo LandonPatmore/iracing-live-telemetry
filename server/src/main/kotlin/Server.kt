@@ -9,6 +9,10 @@ private val usersConnected = ConcurrentLinkedQueue<ConnectedUser>()
 
 fun main() {
     Javalin.create().apply {
+        post("telemetry") { req ->
+            println(req.body())
+        }
+
         ws("/telemetry/{user-id}") { ws ->
             ws.onConnect { context ->
                 usersConnected.add(ConnectedUser(context, context.pathParam("user-id")))
@@ -28,8 +32,8 @@ fun main() {
 
             ws.onMessage { message ->
 //                println(message.message())
-                val q = jacksonObjectMapper().readValue(message.message(), ReceivedMessage::class.java)
-                println(q)
+//                val q = jacksonObjectMapper().readValue(message.message(), ReceivedMessage::class.java)
+//                println(q)
             }
         }
     }.start(7000)

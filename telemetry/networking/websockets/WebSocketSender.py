@@ -1,5 +1,7 @@
 import threading
 from queue import Queue
+
+import jsons
 import websocket
 
 
@@ -12,5 +14,5 @@ class WebSocketSender(threading.Thread):
     def run(self):
         while True:
             item = self.work_queue.get(block=True)
-            print("Sending %s" % item)
+            self.ws.send(jsons.dumps(item))
             self.work_queue.task_done()
