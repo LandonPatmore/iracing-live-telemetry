@@ -6,9 +6,9 @@ Info about the session overall. This info does not change after the first update
 """
 
 
+# Non streamable data (rest api)
 @dataclass
-class GeneralInfo:
-    # Static data
+class PushableGeneralInfo:
     name: str
     trackId: int
     trackConfigName: str

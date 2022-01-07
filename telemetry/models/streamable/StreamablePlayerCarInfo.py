@@ -5,9 +5,9 @@ Info about the car of the user.
 """
 
 
-# Time series data (tick)
+# Streaming data (websocket)
 @dataclass
-class CarInfo:
+class StreamablePlayerCarInfo:
     brakeInput: float
     absActivated: bool
     throttleInput: float

@@ -4,12 +4,8 @@ import time
 import irsdk
 import jsons
 
-from TelemetryDataUtils import get_weather, get_competitors, get_general_info, get_race_info, \
-    get_session_info
-from classes.Message import Message
-from classes.MessageTypes import TELEMETRY
-from classes.State import State
-from classes.TelemetryInfo import TelemetryInfo
+from TelemetryDataUtils import get_streamable_weather_info, get_pushable_competitor_info, get_pushable_general_info, get_streamable_race_info, \
+    get_streamable_session_info
 import threading
 
 from telemetry.WebSocketHandler import WebSocketHandler
@@ -52,9 +48,9 @@ class TelemetryLogger(threading.Thread):
         self.ir.freeze_var_buffer_latest()
 
         return TelemetryInfo(
-            competitorInfo=get_competitors(self.ir),
+            competitorInfo=get_pushable_competitor_info(self.ir),
             # generalInfo=get_general_info(self.ir),
-            raceInfo=get_race_info(self.ir),
-            sessionInfo=get_session_info(self.ir),
-            weatherInfo=get_weather(self.ir)
+            raceInfo=get_streamable_race_info(self.ir),
+            sessionInfo=get_streamable_session_info(self.ir),
+            weatherInfo=get_streamable_weather_info(self.ir)
         )

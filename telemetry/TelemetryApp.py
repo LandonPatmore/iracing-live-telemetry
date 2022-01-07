@@ -1,10 +1,8 @@
-import _thread
 from queue import Queue
-import threading
 
-from classes.MessageTypes import GENERAL_INFO, TELEMETRY
 from telemetry.TelemetryLogger import TelemetryLogger
 from telemetry.WebSocketHandler import WebSocketHandler
+from telemetry.models.MessageTypes import GENERAL_INFO, TELEMETRY
 
 work_queue = Queue()
 websocket_handler = WebSocketHandler(websocket_url="ws://localhost:7000/telemetry/1234", work_queue=work_queue)

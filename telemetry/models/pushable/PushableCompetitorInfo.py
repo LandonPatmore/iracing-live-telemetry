@@ -5,9 +5,9 @@ Info pertaining to a competitor in the session.
 """
 
 
-# Non time series data but does update periodically because of driver changes
+# Non streamable data, but must be updateable as time goes on since drivers can change (rest api)
 @dataclass
-class CompetitorInfo:
+class PushableCompetitorInfo:
     carIdx: int
     userName: str
     userId: int
