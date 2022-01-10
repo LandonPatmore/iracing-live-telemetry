@@ -15,6 +15,7 @@ fun main() {
 
         ws("/telemetry/{user-id}") { ws ->
             ws.onConnect { context ->
+                println("Client connected")
                 usersConnected.add(ConnectedUser(context, context.pathParam("user-id")))
                 if (shouldStartSendingData()) {
                     context.send(SendableMessage(true))
@@ -31,6 +32,7 @@ fun main() {
             }
 
             ws.onMessage { message ->
+                println(message.message())
 //                println(message.message())
 //                val q = jacksonObjectMapper().readValue(message.message(), ReceivedMessage::class.java)
 //                println(q)

@@ -1,17 +1,21 @@
-import threading
-from queue import Queue
+import asyncio
+from asyncio import Queue
+import aiohttp
 import jsons
-import requests
 
 
-class NetworkSender(threading.Thread):
+class NetworkSender:
     def __init__(self, url: str, pushable_queue: Queue):
-        threading.Thread.__init__(self, daemon=True)
         self.pushable_queue = pushable_queue
         self.url = url
 
-    def run(self):
+    async def handler(self, session):
         while True:
-            item = self.pushable_queue.get(block=True)
-            requests.post(self.url, data=jsons.dumps(item))
-            self.pushable_queue.task_done()
+            request = await self.pushable_queue.get()
+            async with session.post(url=self.url, data=jsons.dumps(request)) as resp:
+                response = await resp.text()
+                print("Received response from rest api: %s" % response)
+
+    async def run(self):
+        async with aiohttp.ClientSession() as session:
+            await self.handler(session)
