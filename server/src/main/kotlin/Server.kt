@@ -1,8 +1,9 @@
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.jacksonMapperBuilder
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.javalin.Javalin
 import io.javalin.websocket.WsContext
-import models.TelemetryInfo
+import utils.Client
+import utils.clientMapFromInt
 import java.util.concurrent.ConcurrentLinkedQueue
 
 private val usersConnected = ConcurrentLinkedQueue<ConnectedUser>()
@@ -10,7 +11,19 @@ private val usersConnected = ConcurrentLinkedQueue<ConnectedUser>()
 fun main() {
     Javalin.create().apply {
         post("telemetry") { req ->
-            println(req.body())
+            val request = jacksonObjectMapper().readTree(req.body())
+
+            request.get("client_type")?.let {
+                println(
+                    "Pushable ${
+                        when (clientMapFromInt(it.intValue())) {
+                            Client.Logger -> "Logger message"
+                            Client.Unknown -> "Unknown sender message"
+                            Client.Viewer -> "Viewer message"
+                        }
+                    }"
+                )
+            } ?: println("bad message: ${req.body()}")
         }
 
         ws("/telemetry/{user-id}") { ws ->
@@ -32,10 +45,19 @@ fun main() {
             }
 
             ws.onMessage { message ->
-                println(message.message())
-//                println(message.message())
-//                val q = jacksonObjectMapper().readValue(message.message(), ReceivedMessage::class.java)
-//                println(q)
+                val request = jacksonObjectMapper().readTree(message.message())
+
+                request.get("client_type")?.let {
+                    println(
+                        "Streamable ${
+                            when (clientMapFromInt(it.intValue())) {
+                                Client.Logger -> "Logger message"
+                                Client.Unknown -> "Unknown sender message"
+                                Client.Viewer -> "Viewer message"
+                            }
+                        }"
+                    )
+                } ?: println("bad message: ${message.message()}")
             }
         }
     }.start(7000)
@@ -44,11 +66,6 @@ fun main() {
 private fun shouldStartSendingData(): Boolean = usersConnected.size == 1
 
 private data class SendableMessage(val send: Boolean)
-
-private data class ReceivedMessage(
-    val type: Int,
-    val data: TelemetryInfo
-)
 
 private data class ConnectedUser(
     val webSocketContext: WsContext,

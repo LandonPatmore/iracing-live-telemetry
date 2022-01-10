@@ -1,6 +1,6 @@
-package models
+package models.streamable
 
-data class WeatherInfo(
+data class StreamableWeatherInfo(
     val airTemp: Float,
     val trackTemp: Float,
     val windDirection: Float,

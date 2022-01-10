@@ -1,6 +1,6 @@
-package models
+package models.streamable
 
-data class CarInfo(
+data class StreamablePlayerCarInfo(
     val brakeInput: Float,
     val absActivated: Boolean,
     val throttleInput: Float,

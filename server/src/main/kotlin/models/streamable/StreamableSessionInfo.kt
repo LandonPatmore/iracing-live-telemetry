@@ -1,8 +1,6 @@
-package models
+package models.streamable
 
-data class SessionInfo(
-    val sessionState: Int,
-    val sessionTimeSinceStart: Float,
+data class StreamableSessionInfo(
     val sessionTimeOfDay: Float,
     val sessionTimeRemaining: Float,
     val sessionTimeTotal: Float

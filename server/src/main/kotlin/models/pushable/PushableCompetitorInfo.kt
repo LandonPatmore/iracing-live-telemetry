@@ -1,6 +1,6 @@
-package models
+package models.pushable
 
-data class CompetitorInfo(
+data class PushableCompetitorInfo(
     val carIdx: Int,
     val userName: String,
     val userId: Int,
@@ -8,8 +8,10 @@ data class CompetitorInfo(
     val teamName: String,
     val carNumber: String,
     val carName: String,
+    val carClass: Int,
     val carId: Int,
     val iRating: Int,
     val license: String,
-    val licenseColor: Int
+    val licenseColor: Int,
+    val carIsPaceCar: Int
 )

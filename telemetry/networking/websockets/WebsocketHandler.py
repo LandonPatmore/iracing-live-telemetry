@@ -4,12 +4,15 @@ from asyncio import Queue
 import jsons
 import websockets
 
+from telemetry.models.PackagedMessage import PackagedMessage
+
 
 class WebsocketHandler:
     def __init__(self, url: str, receiver_queue: Queue, streaming_queue: Queue):
         self.receiver_queue: Queue = receiver_queue
         self.streaming_queue: Queue = streaming_queue
         self.url = url
+        self.type = 0
 
     async def consumer_handler(self, websocket):
         async for message in websocket:
@@ -17,8 +20,9 @@ class WebsocketHandler:
 
     async def producer_handler(self, websocket):
         while True:
-            message = await self.streaming_queue.get()
-            await websocket.send(jsons.dumps(message))
+            data = await self.streaming_queue.get()
+            packaged_message = PackagedMessage(message_type=self.type, data=data)
+            await websocket.send(jsons.dumps(packaged_message))
 
     async def handler(self, websocket):
         consumer_task = asyncio.create_task(self.consumer_handler(websocket))

@@ -1,10 +1,10 @@
-package models
+package models.pushable
 
-data class GeneralInfo(
+data class PushableGeneralInfo(
     val name: String,
     val trackId: Int,
     val trackConfigName: String,
     val numTurns: Int,
-    val pitSpeedLimit: String,
+    val pitSpeedLimit: Int,
     val sectors: List<Float>
 )
