@@ -1,2 +1,1 @@
-rootProject.name = "iracing-live-telemetry-server"
-
+rootProject.name = "com.landonpatmore.iracing-live-telemetry"
