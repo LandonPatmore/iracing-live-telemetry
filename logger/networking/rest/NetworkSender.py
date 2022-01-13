@@ -2,8 +2,8 @@ from asyncio import Queue
 import aiohttp
 import jsons
 
-from telemetry.models.MessageTypes import PUSHABLE_AGGREGATOR_MESSAGE
-from telemetry.models.PackagedMessage import PackagedMessage
+from logger.models.MessageTypes import PUSHABLE_AGGREGATOR_MESSAGE
+from logger.models.PackagedMessage import PackagedMessage
 
 
 class NetworkSender:

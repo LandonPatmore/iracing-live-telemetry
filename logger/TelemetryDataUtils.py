@@ -1,13 +1,13 @@
 import math
 from typing import List
 import irsdk
-from telemetry.models.pushable.PushableCompetitorInfo import PushableCompetitorInfo
-from telemetry.models.pushable.PushableGeneralInfo import PushableGeneralInfo
-from telemetry.models.pushable.PushableRaceInfo import PushableRaceInfo
-from telemetry.models.streamable.StreamablePlayerCarInfo import StreamablePlayerCarInfo
-from telemetry.models.streamable.StreamableRaceInfo import StreamableRaceInfo
-from telemetry.models.streamable.StreamableSessionInfo import StreamableSessionInfo
-from telemetry.models.streamable.StreamableWeatherInfo import StreamableWeatherInfo
+from logger.models.pushable.PushableCompetitorInfo import PushableCompetitorInfo
+from logger.models.pushable.PushableGeneralInfo import PushableGeneralInfo
+from logger.models.pushable.PushableRaceInfo import PushableRaceInfo
+from logger.models.streamable.StreamablePlayerCarInfo import StreamablePlayerCarInfo
+from logger.models.streamable.StreamableRaceInfo import StreamableRaceInfo
+from logger.models.streamable.StreamableSessionInfo import StreamableSessionInfo
+from logger.models.streamable.StreamableWeatherInfo import StreamableWeatherInfo
 
 
 def get_drivers_list(ir: irsdk) -> List[int]:

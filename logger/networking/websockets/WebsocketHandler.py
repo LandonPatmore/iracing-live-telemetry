@@ -4,8 +4,8 @@ from asyncio import Queue
 import jsons
 import websockets
 
-from telemetry.models.MessageTypes import STREAMABLE_AGGREGATOR_MESSAGE
-from telemetry.models.PackagedMessage import PackagedMessage
+from logger.models.MessageTypes import STREAMABLE_AGGREGATOR_MESSAGE
+from logger.models.PackagedMessage import PackagedMessage
 
 
 class WebsocketHandler:

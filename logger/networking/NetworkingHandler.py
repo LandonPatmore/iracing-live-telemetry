@@ -1,8 +1,8 @@
 import asyncio
 from asyncio import Queue
-from telemetry.networking.rest.NetworkSender import NetworkSender
+from logger.networking.rest.NetworkSender import NetworkSender
 
-from telemetry.networking.websockets.WebsocketHandler import WebsocketHandler
+from logger.networking.websockets.WebsocketHandler import WebsocketHandler
 
 
 class NetworkingHandler:

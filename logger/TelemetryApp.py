@@ -1,8 +1,8 @@
 import asyncio
 from asyncio import Queue
 
-from telemetry.TelemetryLogger import TelemetryLogger
-from telemetry.networking.NetworkingHandler import NetworkingHandler
+from logger.TelemetryLogger import TelemetryLogger
+from logger.networking.NetworkingHandler import NetworkingHandler
 
 pushable_queue = Queue()
 receiver_queue = Queue()

@@ -13,9 +13,9 @@ from TelemetryDataUtils import (
     get_streamable_session_info
 )
 
-from telemetry.models.State import State
-from telemetry.models.pushable.PushableAggregator import PushableAggregator
-from telemetry.models.streamable.StreamableAggregator import StreamableAggregator
+from logger.models.State import State
+from logger.models.pushable.PushableAggregator import PushableAggregator
+from logger.models.streamable.StreamableAggregator import StreamableAggregator
 
 
 class TelemetryLogger:
