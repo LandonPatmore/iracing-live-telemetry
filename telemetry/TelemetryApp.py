@@ -9,8 +9,8 @@ receiver_queue = Queue()
 streaming_queue = Queue()
 telemetry_logger = TelemetryLogger(receiver_queue=receiver_queue, pushable_queue=pushable_queue,
                                    streaming_queue=streaming_queue)
-networking_handler = NetworkingHandler(websocket_url="ws://localhost:7000/telemetry/1234",
-                                       rest_url="http://localhost:7000/telemetry",
+networking_handler = NetworkingHandler(websocket_url="ws://localhost:7000/logger",
+                                       rest_url="http://localhost:7000/logger",
                                        receiver_queue=receiver_queue,
                                        streaming_queue=streaming_queue, pushable_queue=pushable_queue)
 

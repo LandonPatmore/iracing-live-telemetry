@@ -1,4 +1,4 @@
-package models.pushable
+package com.landonpatmore.models.messaging.pushable
 
 data class PushableRaceInfo(
     val carIdx: Int,

@@ -6,4 +6,3 @@ from typing import Any
 class PackagedMessage:
     message_type: int
     data: Any = object()
-    client_type: int = 0

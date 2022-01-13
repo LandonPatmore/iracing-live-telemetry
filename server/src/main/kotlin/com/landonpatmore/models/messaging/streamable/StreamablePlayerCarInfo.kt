@@ -1,4 +1,4 @@
-package com.landonpatmore.models.streamable.receivable
+package com.landonpatmore.models.messaging.streamable
 
 data class StreamablePlayerCarInfo(
     val brakeInput: Float,

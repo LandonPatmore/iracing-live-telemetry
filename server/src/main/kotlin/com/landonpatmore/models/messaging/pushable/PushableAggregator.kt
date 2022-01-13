@@ -1,4 +1,4 @@
-package models.pushable
+package com.landonpatmore.models.messaging.pushable
 
 data class PushableAggregator(
     val competitorInfo: List<PushableCompetitorInfo>,
