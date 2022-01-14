@@ -14,7 +14,10 @@ data class LoggerClient(
     socket.outgoing.send(Frame.Text("hi"))
     for (message in socket.incoming) {
       when (message) {
-        is Frame.Text -> clientHandler.getConnectedClients<ViewerClient>().broadcast(message.readText())
+        is Frame.Text -> {
+          println(message.readText())
+          clientHandler.getConnectedClients<ViewerClient>().broadcast(message.readText())
+        }
         else -> socket.close(reason = CloseReason(code = CloseReason.Codes.CANNOT_ACCEPT,
             message = "message type not supported"))
       }

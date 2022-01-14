@@ -3,16 +3,9 @@ from asyncio import Queue
 
 import irsdk
 
-from TelemetryDataUtils import (
-    get_pushable_race_info,
-    get_streamable_player_car_info,
-    get_streamable_weather_info,
-    get_pushable_competitor_info,
-    get_pushable_general_info,
-    get_streamable_race_info,
-    get_streamable_session_info
-)
-
+from logger.TelemetryDataUtils import get_streamable_player_car_info, get_streamable_race_info, \
+    get_streamable_session_info, get_streamable_weather_info, get_pushable_competitor_info, get_pushable_general_info, \
+    get_pushable_race_info, get_pushable_session_info
 from logger.models.State import State
 from logger.models.pushable.PushableAggregator import PushableAggregator
 from logger.models.streamable.StreamableAggregator import StreamableAggregator
@@ -38,8 +31,8 @@ class TelemetryLogger:
             self.is_sim_running()
             if self.state.ir_connected:
                 await self.get_iracing_data()
-                await asyncio.sleep(5)
-                # time.sleep(0.1)  # Real
+                # await asyncio.sleep(5)
+                await asyncio.sleep(0.1)
                 # TODO: Figure out how to shut off if told too
             # if self.receiver_queue.empty():
             #     continue
@@ -55,8 +48,7 @@ class TelemetryLogger:
             # we are shutting down ir library (clearing all internal variables)
             self.ir.shutdown()
             print("irsdk disconnected")
-        elif not self.state.ir_connected and self.ir.startup(
-                test_file="../data/data.bin") and self.ir.is_initialized and self.ir.is_connected:
+        elif not self.state.ir_connected and self.ir.startup() and self.ir.is_initialized and self.ir.is_connected:
             self.state.ir_connected = True
             print("irsdk connected")
 
@@ -74,8 +66,9 @@ class TelemetryLogger:
         pushable = PushableAggregator(
             competitorInfo=get_pushable_competitor_info(self.ir),
             generalInfo=get_pushable_general_info(self.ir),
-            raceInfo=get_pushable_race_info(self.ir)
+            raceInfo=get_pushable_race_info(self.ir),
+            sessionInfo=get_pushable_session_info(self.ir)
         )
 
         await self.streaming_queue.put(streamable)
-        await self.pushable_queue.put(pushable)
+        # await self.pushable_queue.put(pushable)

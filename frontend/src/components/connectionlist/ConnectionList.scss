@@ -1,0 +1,27 @@
+.circle {
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+
+  &.circle-disconnected {
+    background-color: #be0101;
+  }
+
+  &.circle-connected {
+    background-color: #2fa80d;
+  }
+}
+
+.flex-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+}
+
+.flex-child {
+  align-self: center;
+}
+
+.flex-child:first-child {
+  margin-right: 10px;
+}

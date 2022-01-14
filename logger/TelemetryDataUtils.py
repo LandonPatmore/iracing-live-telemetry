@@ -4,6 +4,7 @@ import irsdk
 from logger.models.pushable.PushableCompetitorInfo import PushableCompetitorInfo
 from logger.models.pushable.PushableGeneralInfo import PushableGeneralInfo
 from logger.models.pushable.PushableRaceInfo import PushableRaceInfo
+from logger.models.pushable.PushableSessionInfo import PushableSessionInfo
 from logger.models.streamable.StreamablePlayerCarInfo import StreamablePlayerCarInfo
 from logger.models.streamable.StreamableRaceInfo import StreamableRaceInfo
 from logger.models.streamable.StreamableSessionInfo import StreamableSessionInfo
@@ -72,6 +73,22 @@ def get_pushable_race_info(ir: irsdk) -> List[PushableRaceInfo]:
     return list_of_competitor_race_info
 
 
+def get_pushable_session_info(ir: irsdk) -> PushableSessionInfo:
+    return PushableSessionInfo(
+        sessionLapsRemaining=ir["SessionLapsRemainEx"],
+        sessionLapsTotal=ir["SessionLapsTotal"],
+        lfTire=list(),
+        rfTire=list(),
+        lrTire=list(),
+        rrTire=list(),
+        tireSetsAvailable=ir["TireSetsAvailable"],
+        tireSetsUsed=ir["TireSetsUsed"],
+        pitServiceStatus=ir["PlayerCarPitSvStatus"],
+        flagStatus=ir["SessionFlags"],
+        engineWarnings=ir["EngineWarnings"]
+    )
+
+
 def get_streamable_player_car_info(ir: irsdk) -> StreamablePlayerCarInfo:
     return StreamablePlayerCarInfo(
         brakeInput=ir["Brake"],
@@ -81,7 +98,9 @@ def get_streamable_player_car_info(ir: irsdk) -> StreamablePlayerCarInfo:
         speed=ir["Speed"],
         gear=ir["Gear"],
         fuelLevel=ir["FuelLevel"],
-        fuelPercentage=ir["FuelLevelPct"]
+        fuelPercentage=ir["FuelLevelPct"],
+        fuelUsePerHour=ir["FuelUsePerHour"],
+        carsInProximity=ir["CarLeftRight"]
     )
 
 
@@ -113,7 +132,7 @@ def get_streamable_session_info(ir: irsdk) -> StreamableSessionInfo:
 def get_streamable_weather_info(ir: irsdk) -> StreamableWeatherInfo:
     return StreamableWeatherInfo(
         airTemp=ir["AirTemp"],
-        trackTemp=ir["TrackTemp"],
+        trackTemp=ir["TrackTempCrew"],
         windDirection=ir["WindDir"],
         windVelocity=ir["WindVel"]
     )

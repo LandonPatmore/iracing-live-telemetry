@@ -11,3 +11,5 @@ class StreamablePlayerCarInfo:
     gear: int
     fuelLevel: float
     fuelPercentage: float
+    fuelUsePerHour: float
+    carsInProximity: int
