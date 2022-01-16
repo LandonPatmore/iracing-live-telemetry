@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+package com.landonpatmore.models;
+
+message Car {
+  optional float fuelLevel = 1;
+  optional float fuelPercentage = 2;
+  optional float fuelUsePerHour = 3;
+  repeated float lfTireWear = 4;
+  repeated float lrTireWear = 5;
+  repeated float rfTireWear = 6;
+  repeated float rrTireWear = 7;
+  repeated float lfTireTemp = 8;
+  repeated float lrTireTemp = 9;
+  repeated float rfTireTemp = 10;
+  repeated float rrTireTemp = 11;
+  optional int32 tireSetsAvailable = 12;
+  optional int32 tireSetsUsed = 13;
+  optional int32 pitServiceStatus = 14;
+  optional int32 flagStatus = 15;
+  optional int32 engineWarnings = 16;
+  optional int32 carsInProximity = 17;
+}
+
+message Session {
+  optional int32 tick = 1;
+  optional float timeOfDay = 2;
+  optional float timeRemaining = 3;
+  optional float totalLaps = 4;
+  optional float lapsRemaining = 5;
+}
+
+message Weather {
+  optional float airTemp = 1;
+  optional float trackTemp = 2;
+  optional float windDirection = 3;
+  optional float windVelocity = 4;
+}
+
+message Competitor {
+  optional int32 carIdx = 1;
+  optional int32 carClass = 2;
+  optional int32 carClassPosition = 3;
+  optional float intervalBehindLeader = 4;
+  optional float percentageAroundTrack = 5;
+  optional bool onPitRoad = 6;
+  optional int32 position = 7;
+  optional int32 trackStatus = 8;
+  optional int32 bestLapNum = 9;
+  optional float bestLapTime = 10;
+  optional int32 lapsCompleted = 11;
+  optional float lastLapTime = 12;
+  optional string userName = 13;
+  optional int32 userId = 14;
+  optional int32 teamId = 15;
+  optional string teamName = 16;
+  optional string carNumber = 17;
+  optional int32 carId = 18;
+  optional int32 iRating = 19;
+  optional string license = 20;
+}
+
+message Info {
+  optional Car car = 1;
+  optional Session session = 2;
+  optional Weather weather = 3;
+  repeated Competitor competitors = 4;
+}

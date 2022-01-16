@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package com.landonpatmore.models;
+
+message General {
+  optional string name = 1;
+  optional int32 trackId = 2;
+  optional string trackConfigName = 3;
+  optional int32 numTurns = 4;
+  optional int32 pitSpeedLimit = 5;
+  repeated float sectors = 6;
+  optional float totalTime = 7;
+}

@@ -1,138 +1,126 @@
 import math
 from typing import List
 import irsdk
-from logger.models.pushable.PushableCompetitorInfo import PushableCompetitorInfo
-from logger.models.pushable.PushableGeneralInfo import PushableGeneralInfo
-from logger.models.pushable.PushableRaceInfo import PushableRaceInfo
-from logger.models.pushable.PushableSessionInfo import PushableSessionInfo
-from logger.models.streamable.StreamablePlayerCarInfo import StreamablePlayerCarInfo
-from logger.models.streamable.StreamableRaceInfo import StreamableRaceInfo
-from logger.models.streamable.StreamableSessionInfo import StreamableSessionInfo
-from logger.models.streamable.StreamableWeatherInfo import StreamableWeatherInfo
+
+from models import pushable_pb2, streaming_pb2
 
 
-def get_drivers_list(ir: irsdk) -> List[int]:
-    filtered_competitors = list(filter(lambda driver: driver["CarIsPaceCar"] != 1, ir["DriverInfo"]["Drivers"]))
-    return list(map(lambda driver: driver["CarIdx"], filtered_competitors))
+def __getCar(ir: irsdk, info: streaming_pb2.Info):
+    info.car.fuelLevel = ir["FuelLevel"]
+    info.car.fuelPercentage = ir["FuelLevelPct"]
+    info.car.fuelUsePerHour = ir["FuelUsePerHour"]
+    info.car.lfTireWear.extend([ir["LFwearL"], ir["LFwearM"], ir["LFwearR"]])
+    info.car.lrTireWear.extend([ir["LRwearL"], ir["LRwearM"], ir["LRwearR"]])
+    info.car.rfTireWear.extend([ir["RFwearL"], ir["RFwearM"], ir["RFwearR"]])
+    info.car.rrTireWear.extend([ir["RRwearL"], ir["RRwearM"], ir["RRwearR"]])
+    info.car.lfTireTemp.extend([ir["LFtempCL"], ir["LFtempCM"], ir["LFtempCR"]])
+    info.car.lrTireTemp.extend([ir["LRtempCL"], ir["LRtempCM"], ir["LRtempCR"]])
+    info.car.rfTireTemp.extend([ir["RFtempCL"], ir["RFtempCM"], ir["RFtempCR"]])
+    info.car.rrTireTemp.extend([ir["RRtempCL"], ir["RRtempCM"], ir["RRtempCR"]])
+    info.car.tireSetsAvailable = ir["TireSetsAvailable"]
+    info.car.tireSetsUsed = ir["TireSetsUsed"]
+    info.car.pitServiceStatus = ir["PlayerCarPitSvStatus"]
+    info.car.flagStatus = ir["SessionFlags"]
+    info.car.engineWarnings = ir["EngineWarnings"]
+    info.car.carsInProximity = ir["CarLeftRight"]
 
 
-def get_pushable_competitor_info(ir: irsdk) -> List[PushableCompetitorInfo]:
-    drivers = ir["DriverInfo"]["Drivers"]
-    list_of_drivers = list()
-    for car_idx in get_drivers_list(ir):
-        list_of_drivers.append(PushableCompetitorInfo(
-            carIdx=car_idx,
-            userName=drivers[car_idx]["UserName"],
-            userId=drivers[car_idx]["UserID"],
-            teamId=drivers[car_idx]["TeamID"],
-            teamName=drivers[car_idx]["TeamName"],
-            carNumber=drivers[car_idx]["CarNumber"],
-            carName=drivers[car_idx]["CarScreenName"],
-            carClass=ir["CarIdxClass"][car_idx],
-            carId=drivers[car_idx]["CarID"],
-            iRating=drivers[car_idx]["IRating"],
-            license=drivers[car_idx]["LicString"],
-            licenseColor=drivers[car_idx]["LicColor"],
-            carIsPaceCar=drivers[car_idx]['CarIsPaceCar']
-        ))
-
-    return list_of_drivers
+def __getSession(ir: irsdk, info: streaming_pb2.Info) -> streaming_pb2.Session:
+    info.session.tick = ir["SessionTick"]
+    info.session.timeOfDay = ir["SessionTimeOfDay"]
+    info.session.timeRemaining = ir["SessionTimeRemain"]
+    info.session.totalLaps = ir["SessionLapsTotal"]
+    info.session.lapsRemaining = ir["SessionLapsRemainEx"]
 
 
-def get_pushable_general_info(ir: irsdk) -> PushableGeneralInfo:
-    weekend_info = ir["WeekendInfo"]
-    track_speed_limit = weekend_info["TrackPitSpeedLimit"]
+def __getWeather(ir: irsdk, info: streaming_pb2.Info) -> streaming_pb2.Weather:
+    airTemp = ir["AirTemp"]
+    trackTemp = ir["TrackTempCrew"]
+
+    def fToC(temp) -> float:
+        return (temp - 32) * 5 / 9
 
     if ir["DisplayUnits"] == 1:
-        scrubbed_speed_limit = math.ceil(float(track_speed_limit.split()[0]))  # 88.12 kph = 89
+        correctedAirTemp = airTemp
+        correctedTrackTemp = trackTemp
+    else:
+        # convert to c
+        correctedAirTemp = fToC(airTemp)
+        correctedTrackTemp = fToC(trackTemp)
+
+    info.weather.airTemp = correctedAirTemp
+    info.weather.trackTemp = correctedTrackTemp
+    info.weather.windDirection = ir["WindDir"]
+    info.weather.windVelocity = ir["WindVel"]
+
+
+def __getCompetitors(ir: irsdk, info: streaming_pb2.Info):
+    carIdxs: List[int] = list(map(lambda driver: driver["CarIdx"], ir["DriverInfo"]["Drivers"]))
+
+    for idx in carIdxs:
+        competitor: streaming_pb2.Competitor = info.competitors.add()
+
+        competitor.carIdx = idx
+        competitor.carClass = ir["CarIdxClass"][idx]
+        competitor.carClassPosition = ir["CarIdxClassPosition"][idx]
+        competitor.intervalBehindLeader = ir["CarIdxF2Time"][idx]
+        competitor.percentageAroundTrack = ir["CarIdxLapDistPct"][idx]
+        competitor.onPitRoad = ir["CarIdxOnPitRoad"][idx]
+        competitor.position = ir["CarIdxPosition"][idx]
+        competitor.trackStatus = ir["CarIdxTrackSurface"][idx]
+        competitor.bestLapNum = ir["CarIdxBestLapNum"][idx]
+        competitor.bestLapTime = ir["CarIdxBestLapTime"][idx]
+        competitor.lapsCompleted = ir["CarIdxLapCompleted"][idx]
+        competitor.lastLapTime = ir["CarIdxLastLapTime"][idx]
+
+        driverInfo = ir["DriverInfo"]["Drivers"][idx]
+
+        competitor.userName = driverInfo["UserName"]
+        competitor.userId = driverInfo["UserID"]
+
+        teamId = driverInfo["TeamID"]
+        if teamId != 0:
+            competitor.teamId = teamId
+            competitor.teamName = driverInfo["TeamName"]
+
+        competitor.carNumber = driverInfo["CarNumber"]
+        competitor.carId = driverInfo["CarID"]
+        competitor.iRating = driverInfo["IRating"]
+        competitor.license = driverInfo["LicString"]
+
+
+def getInfo(ir: irsdk) -> streaming_pb2.Info:
+    info: streaming_pb2.Info = streaming_pb2.Info()
+
+    __getCar(ir=ir, info=info)
+    __getSession(ir=ir, info=info)
+    __getWeather(ir=ir, info=info)
+    __getCompetitors(ir=ir, info=info)
+
+    return info
+
+
+def getGeneral(ir: irsdk) -> pushable_pb2.General:
+    general: pushable_pb2.General = pushable_pb2.General()
+
+    weekend_info = ir["WeekendInfo"]
+    speedLimit = weekend_info["TrackPitSpeedLimit"]
+
+    def ceilSpeedLimit(speed) -> float:
+        return math.ceil(float(speed))
+
+    if ir["DisplayUnits"] == 1:
+        correctedSpeedLimit = ceilSpeedLimit(speedLimit.split()[0])  # 88.12 kph = 89
     else:
         # convert to kph
-        scrubbed_speed_limit = math.ceil(float(track_speed_limit.split()[0]) * 1.609)  # 54.75 mpb = 89
+        correctedSpeedLimit = ceilSpeedLimit(float(speedLimit.split()[0]) * 1.609)  # 54.75 mpb = 89
 
-    return PushableGeneralInfo(
-        name=weekend_info["TrackDisplayName"],
-        trackId=weekend_info["TrackID"],
-        trackConfigName=weekend_info["TrackConfigName"],
-        numTurns=weekend_info["TrackNumTurns"],
-        pitSpeedLimit=scrubbed_speed_limit,
-        sectors=list(map(lambda sector: sector["SectorStartPct"], ir["SplitTimeInfo"]["Sectors"]))
-    )
+    general.name = weekend_info["TrackDisplayName"]
+    general.trackId = weekend_info["TrackID"]
+    general.trackConfigName = weekend_info["TrackConfigName"]
+    general.numTurns = weekend_info["TrackNumTurns"]
+    general.pitSpeedLimit = correctedSpeedLimit
+    general.sectors.extend(list(map(lambda sector: sector["SectorStartPct"], ir["SplitTimeInfo"]["Sectors"])))
+    general.totalTime = ir["SessionTimeTotal"]
 
-
-def get_pushable_race_info(ir: irsdk) -> List[PushableRaceInfo]:
-    list_of_competitor_race_info = list()
-    for car_idx in get_drivers_list(ir):
-        list_of_competitor_race_info.append(PushableRaceInfo(
-            carIdx=car_idx,
-            bestLapNum=ir["CarIdxBestLapNum"][car_idx],
-            bestLapTime=ir["CarIdxBestLapTime"][car_idx],
-            lapsCompleted=ir["CarIdxLapCompleted"][car_idx],
-            lastLapTime=ir["CarIdxLastLapTime"][car_idx],
-        ))
-
-    return list_of_competitor_race_info
-
-
-def get_pushable_session_info(ir: irsdk) -> PushableSessionInfo:
-    return PushableSessionInfo(
-        sessionLapsRemaining=ir["SessionLapsRemainEx"],
-        sessionLapsTotal=ir["SessionLapsTotal"],
-        lfTire=list(),
-        rfTire=list(),
-        lrTire=list(),
-        rrTire=list(),
-        tireSetsAvailable=ir["TireSetsAvailable"],
-        tireSetsUsed=ir["TireSetsUsed"],
-        pitServiceStatus=ir["PlayerCarPitSvStatus"],
-        flagStatus=ir["SessionFlags"],
-        engineWarnings=ir["EngineWarnings"]
-    )
-
-
-def get_streamable_player_car_info(ir: irsdk) -> StreamablePlayerCarInfo:
-    return StreamablePlayerCarInfo(
-        brakeInput=ir["Brake"],
-        absActivated=ir["BrakeABSactive"],
-        throttleInput=ir["Throttle"],
-        rpm=ir["RPM"],
-        speed=ir["Speed"],
-        gear=ir["Gear"],
-        fuelLevel=ir["FuelLevel"],
-        fuelPercentage=ir["FuelLevelPct"],
-        fuelUsePerHour=ir["FuelUsePerHour"],
-        carsInProximity=ir["CarLeftRight"]
-    )
-
-
-def get_streamable_race_info(ir: irsdk) -> List[StreamableRaceInfo]:
-    list_of_streamable_race_info = list()
-
-    for car_idx in get_drivers_list(ir):
-        list_of_streamable_race_info.append(StreamableRaceInfo(
-            carClassPosition=ir["CarIdxClassPosition"][car_idx],
-            intervalBehindLeader=ir["CarIdxF2Time"][car_idx],
-            percentageAroundTrack=ir["CarIdxLapDistPct"][car_idx],
-            onPitRoad=ir["CarIdxOnPitRoad"][car_idx],
-            position=ir["CarIdxPosition"][car_idx],
-            onTrackStatus=ir["CarIdxTrackSurface"][car_idx],
-            relativeFromCurrentPlayer=ir['CarIdxEstTime'][car_idx]
-        ))
-
-    return list_of_streamable_race_info
-
-
-def get_streamable_session_info(ir: irsdk) -> StreamableSessionInfo:
-    return StreamableSessionInfo(
-        sessionTimeOfDay=ir["SessionTimeOfDay"],
-        sessionTimeRemaining=ir["SessionTimeRemain"],
-        sessionTimeTotal=ir["SessionTimeTotal"]
-    )
-
-
-def get_streamable_weather_info(ir: irsdk) -> StreamableWeatherInfo:
-    return StreamableWeatherInfo(
-        airTemp=ir["AirTemp"],
-        trackTemp=ir["TrackTempCrew"],
-        windDirection=ir["WindDir"],
-        windVelocity=ir["WindVel"]
-    )
+    return general

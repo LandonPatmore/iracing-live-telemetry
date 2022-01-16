@@ -1,11 +1,6 @@
 import asyncio
 from asyncio import Queue
-
-import jsons
 import websockets
-
-from logger.models.MessageTypes import STREAMABLE_AGGREGATOR_MESSAGE
-from logger.models.PackagedMessage import PackagedMessage
 
 
 class WebsocketHandler:
@@ -21,8 +16,7 @@ class WebsocketHandler:
     async def producer_handler(self, websocket):
         while True:
             data = await self.streaming_queue.get()
-            packaged_message = PackagedMessage(message_type=STREAMABLE_AGGREGATOR_MESSAGE, data=data)
-            await websocket.send(jsons.dumps(packaged_message))
+            await websocket.send(data)
 
     async def handler(self, websocket):
         consumer_task = asyncio.create_task(self.consumer_handler(websocket))

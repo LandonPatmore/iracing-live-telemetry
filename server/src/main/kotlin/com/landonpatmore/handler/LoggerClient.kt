@@ -1,10 +1,7 @@
 package com.landonpatmore.handler
 
-import io.ktor.http.cio.websocket.CloseReason
-import io.ktor.http.cio.websocket.DefaultWebSocketSession
-import io.ktor.http.cio.websocket.Frame
-import io.ktor.http.cio.websocket.close
-import io.ktor.http.cio.websocket.readText
+import com.landonpatmore.models.Streaming
+import io.ktor.http.cio.websocket.*
 
 data class LoggerClient(
     override val socket: DefaultWebSocketSession,
@@ -14,10 +11,7 @@ data class LoggerClient(
     socket.outgoing.send(Frame.Text("hi"))
     for (message in socket.incoming) {
       when (message) {
-        is Frame.Text -> {
-          println(message.readText())
-          clientHandler.getConnectedClients<ViewerClient>().broadcast(message.readText())
-        }
+        is Frame.Binary -> printStreamingProto(message.readBytes())
         else -> socket.close(reason = CloseReason(code = CloseReason.Codes.CANNOT_ACCEPT,
             message = "message type not supported"))
       }

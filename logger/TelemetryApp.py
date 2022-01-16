@@ -1,16 +1,16 @@
 import asyncio
 from asyncio import Queue
 
-from logger.TelemetryLogger import TelemetryLogger
-from logger.networking.NetworkingHandler import NetworkingHandler
+from TelemetryLogger import TelemetryLogger
+from networking.NetworkingHandler import NetworkingHandler
 
 pushable_queue = Queue()
 receiver_queue = Queue()
 streaming_queue = Queue()
 telemetry_logger = TelemetryLogger(receiver_queue=receiver_queue, pushable_queue=pushable_queue,
                                    streaming_queue=streaming_queue)
-networking_handler = NetworkingHandler(websocket_url="ws://192.168.86.64:7000/logger",
-                                       rest_url="http://192.168.86.64:7000/logger",
+networking_handler = NetworkingHandler(websocket_url="ws://localhost:7000/logger",
+                                       rest_url="http://localhost:7000/logger",
                                        receiver_queue=receiver_queue,
                                        streaming_queue=streaming_queue, pushable_queue=pushable_queue)
 

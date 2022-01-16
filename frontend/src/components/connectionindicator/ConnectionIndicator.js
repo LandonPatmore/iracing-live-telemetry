@@ -9,7 +9,6 @@ class ConnectionIndicator extends React.Component {
     }
 
     render() {
-        console.log(this.props.connected)
         return (
             <div className="flex-container">
                 <div className="flex-child">
