@@ -6,6 +6,7 @@ import ConnectionIndicator from "./components/connectionindicator/ConnectionIndi
 import TrackMap from "./components/trackmap/TrackMap";
 import WeatherInfo from "./components/weatherinfo/WeatherInfo";
 import SessionInfo from "./components/sessioninfo/SessionInfo";
+import {TypedMessage} from "./models/typed_message_pb";
 
 const client = new W3CWebSocket("ws://192.168.86.32:7000/viewer")
 
@@ -16,28 +17,7 @@ class App extends React.Component {
 
         this.state = {
             connected: false,
-            message: {
-                data: {
-                    playerCarIdx: 0,
-                    playerCarInfo: {
-                        carsInProximity: 0,
-                        fuelUsePerHour: 0,
-                        fuelLevel: 0
-                    },
-                    raceInfo: [],
-                    sessionInfo: {
-                        sessionTimeOfDay: 0,
-                        sessionTimeRemaining: 0,
-                        sessionTimeTotal: 0
-                    },
-                    weatherInfo: {
-                        airTemp: 0,
-                        trackTemp: 0,
-                        windDirection: 0,
-                        windVelocity: 0
-                    }
-                }
-            }
+            message: Object
         }
     }
 
@@ -47,7 +27,7 @@ class App extends React.Component {
             this.setState({connected: true})
         }
         client.onmessage = (message) => {
-            this.setState({message: JSON.parse(message.data)})
+            this.setState({message: TypedMessage.deserializeBinary(message).toObject()})
         }
         client.onclose = () => {
             this.setState({connected: false})

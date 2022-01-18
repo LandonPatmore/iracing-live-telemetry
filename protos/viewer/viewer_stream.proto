@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package com.landonpatmore.models.viewer.stream;
+
+import "logger/logger_stream.proto";
+
+message CarStream {
+  optional float fuelLevel = 1;
+  optional float fuelPercentage = 2;
+  optional float fuelUsePerHour = 3;
+  optional int32 flagStatus = 4;
+  optional int32 engineWarnings = 5;
+  optional int32 carsInProximity = 6;
+}
+
+message CompetitorStream {
+  optional int32 carIdx = 1;
+  optional int32 carClassPosition = 2;
+  optional float percentageAroundTrack = 3;
+  optional bool onPitRoad = 4;
+  optional int32 position = 5;
+  optional int32 trackStatus = 6;
+}
+
+message InfoStream {
+  optional stream.CarStream car = 1;
+  optional logger.LoggerWeather weather = 2;
+  optional logger.LoggerSession session = 3;
+  repeated stream.CompetitorStream competitors = 4;
+}

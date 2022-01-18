@@ -3,6 +3,7 @@ package com.landonpatmore.plugins
 import com.landonpatmore.handler.ClientHandler
 import com.landonpatmore.handler.LoggerClient
 import com.landonpatmore.handler.ViewerClient
+import com.landonpatmore.utils.DataArbiter
 import io.ktor.application.Application
 import io.ktor.application.install
 import io.ktor.http.cio.websocket.pingPeriod
@@ -25,7 +26,7 @@ fun Application.configureSockets() {
     val clientHandler = ClientHandler()
 
     webSocket("/logger") {
-      val client = LoggerClient(socket = this, clientHandler = clientHandler)
+      val client = LoggerClient(socket = this, clientHandler = clientHandler, dataArbiter = DataArbiter)
       clientHandler.addUser(client)
       client.consumeMessages()
       // Connection has closed

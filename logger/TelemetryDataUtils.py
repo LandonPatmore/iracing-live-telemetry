@@ -2,10 +2,10 @@ import math
 from typing import List
 import irsdk
 
-from models import pushable_pb2, streaming_pb2
+from models import logger_stream_pb2, logger_update_pb2
 
 
-def __getCar(ir: irsdk, info: streaming_pb2.Info):
+def __getCar(ir: irsdk, info: logger_stream_pb2.LoggerInfo):
     info.car.fuelLevel = ir["FuelLevel"]
     info.car.fuelPercentage = ir["FuelLevelPct"]
     info.car.fuelUsePerHour = ir["FuelUsePerHour"]
@@ -25,7 +25,7 @@ def __getCar(ir: irsdk, info: streaming_pb2.Info):
     info.car.carsInProximity = ir["CarLeftRight"]
 
 
-def __getSession(ir: irsdk, info: streaming_pb2.Info) -> streaming_pb2.Session:
+def __getSession(ir: irsdk, info: logger_stream_pb2.LoggerInfo) -> logger_stream_pb2.LoggerSession:
     info.session.tick = ir["SessionTick"]
     info.session.timeOfDay = ir["SessionTimeOfDay"]
     info.session.timeRemaining = ir["SessionTimeRemain"]
@@ -33,7 +33,7 @@ def __getSession(ir: irsdk, info: streaming_pb2.Info) -> streaming_pb2.Session:
     info.session.lapsRemaining = ir["SessionLapsRemainEx"]
 
 
-def __getWeather(ir: irsdk, info: streaming_pb2.Info) -> streaming_pb2.Weather:
+def __getWeather(ir: irsdk, info: logger_stream_pb2.LoggerInfo) -> logger_stream_pb2.LoggerWeather:
     airTemp = ir["AirTemp"]
     trackTemp = ir["TrackTempCrew"]
 
@@ -54,11 +54,11 @@ def __getWeather(ir: irsdk, info: streaming_pb2.Info) -> streaming_pb2.Weather:
     info.weather.windVelocity = ir["WindVel"]
 
 
-def __getCompetitors(ir: irsdk, info: streaming_pb2.Info):
+def __getCompetitors(ir: irsdk, info: logger_stream_pb2.LoggerInfo):
     carIdxs: List[int] = list(map(lambda driver: driver["CarIdx"], ir["DriverInfo"]["Drivers"]))
 
     for idx in carIdxs:
-        competitor: streaming_pb2.Competitor = info.competitors.add()
+        competitor: logger_stream_pb2.LoggerCompetitor = info.competitors.add()
 
         competitor.carIdx = idx
         competitor.carClass = ir["CarIdxClass"][idx]
@@ -89,8 +89,8 @@ def __getCompetitors(ir: irsdk, info: streaming_pb2.Info):
         competitor.license = driverInfo["LicString"]
 
 
-def getInfo(ir: irsdk) -> streaming_pb2.Info:
-    info: streaming_pb2.Info = streaming_pb2.Info()
+def getInfo(ir: irsdk) -> logger_stream_pb2.LoggerInfo:
+    info: logger_stream_pb2.LoggerInfo = logger_stream_pb2.LoggerInfo()
 
     __getCar(ir=ir, info=info)
     __getSession(ir=ir, info=info)
@@ -100,8 +100,8 @@ def getInfo(ir: irsdk) -> streaming_pb2.Info:
     return info
 
 
-def getGeneral(ir: irsdk) -> pushable_pb2.General:
-    general: pushable_pb2.General = pushable_pb2.General()
+def getGeneral(ir: irsdk) -> logger_update_pb2.LoggerGeneral:
+    general: logger_update_pb2.LoggerGeneral = logger_update_pb2.LoggerGeneral()
 
     weekend_info = ir["WeekendInfo"]
     speedLimit = weekend_info["TrackPitSpeedLimit"]

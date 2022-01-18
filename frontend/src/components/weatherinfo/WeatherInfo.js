@@ -1,7 +1,6 @@
 import React from "react"
 import "./WeatherInfo.scss"
-import {Stage, Layer, Rect, Circle, Text, Group, Arrow} from "react-konva";
-
+import {Stage, Layer, Arrow} from "react-konva";
 
 class WeatherInfo extends React.Component {
     constructor(props) {

@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package com.landonpatmore.models;
+package com.landonpatmore.models.logger;
 
-message Car {
+message LoggerCar {
   optional float fuelLevel = 1;
   optional float fuelPercentage = 2;
   optional float fuelUsePerHour = 3;
@@ -22,22 +22,23 @@ message Car {
   optional int32 carsInProximity = 17;
 }
 
-message Session {
+message LoggerSession {
   optional int32 tick = 1;
   optional float timeOfDay = 2;
   optional float timeRemaining = 3;
   optional float totalLaps = 4;
   optional float lapsRemaining = 5;
 }
+// TODO: Session Id to distinguish sessions from each other
 
-message Weather {
+message LoggerWeather {
   optional float airTemp = 1;
   optional float trackTemp = 2;
   optional float windDirection = 3;
   optional float windVelocity = 4;
 }
 
-message Competitor {
+message LoggerCompetitor {
   optional int32 carIdx = 1;
   optional int32 carClass = 2;
   optional int32 carClassPosition = 3;
@@ -60,9 +61,10 @@ message Competitor {
   optional string license = 20;
 }
 
-message Info {
-  optional Car car = 1;
-  optional Session session = 2;
-  optional Weather weather = 3;
-  repeated Competitor competitors = 4;
+message LoggerInfo {
+  optional int32 tick = 1;
+  optional LoggerCar car = 2;
+  optional LoggerSession session = 3;
+  optional LoggerWeather weather = 4;
+  repeated LoggerCompetitor competitors = 5;
 }

@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package com.landonpatmore.models.viewer.update;
+
+message CarUpdate {
+  optional int32 tick = 1;
+  repeated float lfTireWear = 2;
+  repeated float lrTireWear = 3;
+  repeated float rfTireWear = 4;
+  repeated float rrTireWear = 5;
+  repeated float lfTireTemp = 6;
+  repeated float lrTireTemp = 7;
+  repeated float rfTireTemp = 8;
+  repeated float rrTireTemp = 9;
+  optional int32 tireSetsAvailable = 10;
+  optional int32 tireSetsUsed = 11;
+  optional int32 pitServiceStatus = 12;
+}
+
+message CompetitorUpdate {
+  optional int32 tick = 1;
+  optional int32 carIdx = 2;
+  optional int32 bestLapNum = 3;
+  optional float bestLapTime = 4;
+  optional int32 lapsCompleted = 5;
+  optional float lastLapTime = 6;
+  optional int32 carClassPosition = 7;
+  optional int32 position = 8;
+}
+
+message RacerUpdate {
+  optional int32 tick = 1;
+  optional int32 carIdx = 2;
+  optional string userName = 3;
+  optional int32 userId = 4;
+  optional int32 teamId = 5;
+  optional string teamName = 6;
+  optional string carNumber = 7;
+  optional int32 carId = 8;
+  optional int32 iRating = 9;
+  optional string license = 10;
+}
+
+message CompetitorsUpdate {
+  repeated CompetitorUpdate competitors = 1;
+}
+
+message RacersUpdate {
+  repeated RacerUpdate racers = 1;
+}

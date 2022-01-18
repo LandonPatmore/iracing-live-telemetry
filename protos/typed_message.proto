@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package com.landonpatmore.models;
+
+import "google/protobuf/any.proto";
+
+message TypedMessage {
+  enum Type {
+    UNKNOWN = 0;
+    LOGGER_STREAM = 1;
+    LOGGER_UPDATE = 2;
+    VIEWER_GENERAL_UPDATE = 3;
+    VIEWER_CAR_UPDATE = 4;
+    VIEWER_COMPETITORS_UPDATE = 5;
+    VIEWER_RACERS_UPDATE = 6;
+    VIEWER_STREAM = 7;
+  }
+  optional Type type = 1;
+  optional google.protobuf.Any message = 2;
+}
